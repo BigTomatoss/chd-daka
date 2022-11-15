@@ -2,6 +2,7 @@ import time
 import os
 import requests
 from selenium import webdriver
+from pypushdeer import PushDeer
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
@@ -10,11 +11,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
 def push(text, output_data, wxkey):
-    data = {
-            'text': text,
-            'desp': output_data
-        }
-    requests.post('https://sctapi.ftqq.com/'+wxkey+'.send', data=data)
+
+    pushdeer = PushDeer(pushkey=wxkey)
+    pushdeer.send_text(text, desp=output_data)
 
 def task(username, password, address, position, wxkey):
     output_data = ""
@@ -115,19 +114,19 @@ def task(username, password, address, position, wxkey):
         
             output_data += '\n\n- 打卡信息:'
             output_data += f'\n\n\t {{\n\n\t \t{name},\n\n\t \t{gh},\n\n\t \t{date}\n\n\t }}'
-            text = f"{username}打卡成功😎"
+            text = f"打卡成功😎"
            
             flag = False
         except Exception as e:
             output_data += '\n\n- 打卡出错😫...'
             output_data += f'\n\n\t- {e}\n\t'
-            text = f"{username}打卡失败🙃,请自行打卡"
+            text = f"打卡失败🙃,请自行打卡"
             try:
                 driver.refresh()
                 time.sleep(2)
                 status = driver.find_element(By.XPATH, '//*[@id="app"]/div/div[2]/div').text
                 if status == '该时间为非打卡时间' or status == '上级部门已确认':
-                    text = f"{username}打卡失败🙃,未到打卡时间"
+                    text = f"打卡失败🙃,未到打卡时间"
                     output_data += '\n\n- 未到打卡时间...😅' 
                     output_data += '\n\n- 晨卡打卡时间为:07:00:00-10:00:00\n\n- 午卡打卡时间为:10:00:01-15:00:00'
                     flag = False 
@@ -152,4 +151,3 @@ def run():
     task(env_dist['username'], env_dist['password'], env_dist['address'], position, env_dist['wxkey'])
 if __name__ == "__main__":
     run()
-    
