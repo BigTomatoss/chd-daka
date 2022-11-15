@@ -151,3 +151,4 @@ def run():
     task(env_dist['username'], env_dist['password'], env_dist['address'], position, env_dist['wxkey'])
 if __name__ == "__main__":
     run()
+    
